@@ -20,6 +20,7 @@ Usage: iota [<filename>] [options]
 
 Options:
     --vi                           Start Iota with vi-like modes
+    --gui                          Start Iota with common graphical key bindings
     --enable-syntax-highlighting   Start Iota with syntax-highlighting enabled
     -h, --help                     Show this message.
 ";
@@ -29,6 +30,7 @@ Options:
 struct Args {
     arg_filename: Option<String>,
     flag_vi: bool,
+    flag_gui: bool,
     flag_enable_syntax_highlighting: bool,
     flag_help: bool,
 }
@@ -68,6 +70,8 @@ fn main() {
     // initialise the editor mode
     let mode: Box<Mode> = if args.flag_vi {
         Box::new(NormalMode::new())
+    } else if args.flag_gui {
+         Box::new(StandardMode::new())
     } else {
          Box::new(StandardMode::new())
     };
