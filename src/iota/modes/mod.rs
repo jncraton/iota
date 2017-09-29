@@ -4,7 +4,9 @@ use command::BuilderEvent;
 pub use self::standard::StandardMode;
 pub use self::normal::NormalMode;
 pub use self::insert::InsertMode;
+pub use self::gui::GUIMode;
 
+mod gui;
 mod standard;
 mod normal;
 mod insert;

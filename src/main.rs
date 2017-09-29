@@ -10,7 +10,7 @@ use std::io::stdin;
 use docopt::Docopt;
 use iota::{
     Editor, Input,
-    StandardMode, NormalMode,
+    StandardMode, NormalMode, GUIMode,
     Mode, Options,
 };
 use rustbox::{InitOptions, RustBox, InputMode, OutputMode};
@@ -71,7 +71,7 @@ fn main() {
     let mode: Box<Mode> = if args.flag_vi {
         Box::new(NormalMode::new())
     } else if args.flag_gui {
-         Box::new(StandardMode::new())
+         Box::new(GUIMode::new())
     } else {
          Box::new(StandardMode::new())
     };
