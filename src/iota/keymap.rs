@@ -1,6 +1,6 @@
 use keyboard::Key;
-use std::collections::HashMap;
 use std::collections::hash_map::Entry;
+use std::collections::HashMap;
 
 pub enum Trie<T: Copy> {
     Leaf(T),
