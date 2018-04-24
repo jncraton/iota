@@ -5,13 +5,13 @@ use std::sync::{Arc, Mutex};
 
 use rustbox::{Event, RustBox};
 
+use bindings;
 use buffer::Buffer;
 use command::Command;
 use command::{Action, BuilderEvent, Instruction, Operation};
 use input::Input;
 use key::Key;
 use view::View;
-use bindings;
 
 /// The main Editor structure
 ///

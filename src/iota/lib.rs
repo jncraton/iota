@@ -19,13 +19,13 @@ extern crate lazy_static;
 pub use editor::Editor;
 pub use input::Input;
 
+mod bindings;
 mod buffer;
 mod command;
 mod editor;
 mod input;
 mod iterators;
 mod key;
-mod bindings;
 mod log;
 mod overlay;
 mod textobject;
