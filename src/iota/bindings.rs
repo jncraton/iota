@@ -39,61 +39,46 @@ pub fn handle_key_event(key: Key) -> BuilderEvent {
             Kind::Line(Anchor::Start),
         ),
 
+        // Editing
+        Key::Tab => Command::insert_tab(),
+        Key::Enter => Command::insert_char('\n'),
+        Key::Backspace => Command {
+            number: 1,
+            action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
+            object: Some(TextObject {
+                kind: Kind::Char,
+                offset: Offset::Backward(1, Mark::Cursor(0)),
+            }),
+        },
+        Key::Delete => Command {
+            number: 1,
+            action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
+            object: Some(TextObject {
+                kind: Kind::Char,
+                offset: Offset::Forward(1, Mark::Cursor(0)),
+            }),
+        },
+        Key::Ctrl('h') => Command {
+            number: 1,
+            action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
+            object: Some(TextObject {
+                kind: Kind::Char,
+                offset: Offset::Backward(1, Mark::Cursor(0)),
+            }),
+        },
+
+        Key::Ctrl('d') => Command::duplicate_selection(),
+        Key::Ctrl('k') => Command::delete_selection(),
+        Key::Ctrl('x') => Command::cut_selection(),
+        Key::Ctrl('c') => Command::copy_selection(),
+        Key::Ctrl('v') => Command::paste(),
+        Key::CtrlUp => Command::move_selection(false),
+        Key::CtrlDown => Command::move_selection(true),
+
+        // History
+        Key::Ctrl('z') => Command::undo(),
+        Key::Ctrl('y') => Command::redo(),
+
         _ => Command::noop(),
     })
 }
-/*
-
-        // Editing
-        keymap.bind_key(Key::Tab, Command::insert_tab());
-        keymap.bind_key(Key::Enter, Command::insert_char('\n'));
-        keymap.bind_key(
-            Key::Backspace,
-            Command {
-                number: 1,
-                action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
-                object: Some(TextObject {
-                    kind: Kind::Char,
-                    offset: Offset::Backward(1, Mark::Cursor(0)),
-                }),
-            },
-        );
-        keymap.bind_key(
-            Key::Delete,
-            Command {
-                number: 1,
-                action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
-                object: Some(TextObject {
-                    kind: Kind::Char,
-                    offset: Offset::Forward(1, Mark::Cursor(0)),
-                }),
-            },
-        );
-        keymap.bind_key(
-            Key::Ctrl('h'),
-            Command {
-                number: 1,
-                action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
-                object: Some(TextObject {
-                    kind: Kind::Char,
-                    offset: Offset::Backward(1, Mark::Cursor(0)),
-                }),
-            },
-        );
-
-        keymap.bind_key(Key::Ctrl('d'), Command::duplicate_selection());
-        keymap.bind_key(Key::Ctrl('k'), Command::delete_selection());
-        keymap.bind_key(Key::Ctrl('x'), Command::cut_selection());
-        keymap.bind_key(Key::Ctrl('c'), Command::copy_selection());
-        keymap.bind_key(Key::Ctrl('v'), Command::paste());
-        keymap.bind_key(Key::CtrlUp, Command::move_selection(false));
-        keymap.bind_key(Key::CtrlDown, Command::move_selection(true));
-
-        // History
-        keymap.bind_key(Key::Ctrl('z'), Command::undo());
-        keymap.bind_key(Key::Ctrl('y'), Command::redo());
-
-
-    }
-}
-*/
