@@ -1,7 +1,5 @@
 # Iota [![Build Status](https://travis-ci.org/jncraton/iota.svg?branch=master)](https://travis-ci.org/jncraton/iota)
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gchp/iota?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 A terminal-based text-editor written in Rust.
 
 ## Motivation
