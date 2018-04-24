@@ -1,12 +1,19 @@
 language: rust
 os:
-    - linux
+  - linux
+rust:
+  - stable
+  - beta
+  - nightly
+matrix:
+  allow-failures:
+    - rust: nightly
 before_script:
-    - rustup toolchain install nightly
-    - rustup component add --toolchain nightly rustfmt-preview
-    - which rustfmt || cargo install --force rustfmt-nightly
+  - rustup toolchain install nightly
+  - rustup component add --toolchain nightly rustfmt-preview
+  - which rustfmt || cargo install --force rustfmt-nightly
 script:
-    - cargo fmt --version
-    - cargo +nightly fmt --all -- --write-mode=diff
-    - cargo build --verbose
-    - cargo test --verbose
+  - cargo +nightly fmt --version
+  - cargo +nightly fmt --all -- --write-mode=diff
+  - cargo build --verbose
+  - cargo test --verbose
