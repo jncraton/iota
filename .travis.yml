@@ -2,10 +2,11 @@ language: rust
 os:
     - linux
 before_script:
-    - rustup default nightly
-    - rustup component add rustfmt-preview
+    - rustup toolchain install nightly
+    - rustup component add --toolchain nightly rustfmt-preview
+    - which rustfmt || cargo install --force rustfmt-nightly
 script:
     - cargo fmt --version
-    - cargo fmt --all -- --write-mode=diff
+    - cargo +nightly fmt --all -- --write-mode=diff
     - cargo build --verbose
     - cargo test --verbose
