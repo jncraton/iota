@@ -1,12 +1,10 @@
+use buffer::Mark;
+use command::{Action, BuilderEvent, Command, Operation};
 use keyboard::Key;
 use keymap::{KeyMap, KeyMapState};
-use buffer::Mark;
-use command::{BuilderEvent, Operation, Command, Action};
-use textobject::{Anchor, Kind, TextObject, Offset};
+use textobject::{Anchor, Kind, Offset, TextObject};
 
 use super::Mode;
-
-
 
 /// Standard mode is Iota's default mode.
 ///
@@ -22,7 +20,6 @@ pub struct StandardMode {
 }
 
 impl StandardMode {
-
     /// Create a new instance of StandardMode
     pub fn new() -> StandardMode {
         StandardMode {
@@ -40,44 +37,92 @@ impl StandardMode {
         keymap.bind_key(Key::Ctrl('s'), Command::save_buffer());
 
         // Cursor movement
-        keymap.bind_key(Key::Up, Command::movement(Offset::Backward(1, Mark::Cursor(0)), Kind::Line(Anchor::Same)));
-        keymap.bind_key(Key::Down, Command::movement(Offset::Forward(1, Mark::Cursor(0)), Kind::Line(Anchor::Same)));
-        keymap.bind_key(Key::Left, Command::movement(Offset::Backward(1, Mark::Cursor(0)), Kind::Char));
-        keymap.bind_key(Key::Right, Command::movement(Offset::Forward(1, Mark::Cursor(0)), Kind::Char));
+        keymap.bind_key(
+            Key::Up,
+            Command::movement(
+                Offset::Backward(1, Mark::Cursor(0)),
+                Kind::Line(Anchor::Same),
+            ),
+        );
+        keymap.bind_key(
+            Key::Down,
+            Command::movement(
+                Offset::Forward(1, Mark::Cursor(0)),
+                Kind::Line(Anchor::Same),
+            ),
+        );
+        keymap.bind_key(
+            Key::Left,
+            Command::movement(Offset::Backward(1, Mark::Cursor(0)), Kind::Char),
+        );
+        keymap.bind_key(
+            Key::Right,
+            Command::movement(Offset::Forward(1, Mark::Cursor(0)), Kind::Char),
+        );
 
-        keymap.bind_key(Key::CtrlRight, Command::movement(Offset::Forward(1, Mark::Cursor(0)), Kind::Word(Anchor::Start)));
-        keymap.bind_key(Key::CtrlLeft, Command::movement(Offset::Backward(1, Mark::Cursor(0)), Kind::Word(Anchor::Start)));
-    
-        keymap.bind_key(Key::End, Command::movement(Offset::Forward(0, Mark::Cursor(0)), Kind::Line(Anchor::End)));
-        keymap.bind_key(Key::Home, Command::movement(Offset::Backward(0, Mark::Cursor(0)), Kind::Line(Anchor::Start)));
+        keymap.bind_key(
+            Key::CtrlRight,
+            Command::movement(
+                Offset::Forward(1, Mark::Cursor(0)),
+                Kind::Word(Anchor::Start),
+            ),
+        );
+        keymap.bind_key(
+            Key::CtrlLeft,
+            Command::movement(
+                Offset::Backward(1, Mark::Cursor(0)),
+                Kind::Word(Anchor::Start),
+            ),
+        );
+
+        keymap.bind_key(
+            Key::End,
+            Command::movement(Offset::Forward(0, Mark::Cursor(0)), Kind::Line(Anchor::End)),
+        );
+        keymap.bind_key(
+            Key::Home,
+            Command::movement(
+                Offset::Backward(0, Mark::Cursor(0)),
+                Kind::Line(Anchor::Start),
+            ),
+        );
 
         // Editing
         keymap.bind_key(Key::Tab, Command::insert_tab());
         keymap.bind_key(Key::Enter, Command::insert_char('\n'));
-        keymap.bind_key(Key::Backspace, Command {
-            number: 1,
-            action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
-            object: Some(TextObject {
-                kind: Kind::Char,
-                offset: Offset::Backward(1, Mark::Cursor(0))
-            })
-        });
-        keymap.bind_key(Key::Delete, Command {
-            number: 1,
-            action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
-            object: Some(TextObject {
-                kind: Kind::Char,
-                offset: Offset::Forward(1, Mark::Cursor(0))
-            })
-        });
-        keymap.bind_key(Key::Ctrl('h'), Command {
-            number: 1,
-            action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
-            object: Some(TextObject {
-                kind: Kind::Char,
-                offset: Offset::Backward(1, Mark::Cursor(0))
-            })
-        });
+        keymap.bind_key(
+            Key::Backspace,
+            Command {
+                number: 1,
+                action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
+                object: Some(TextObject {
+                    kind: Kind::Char,
+                    offset: Offset::Backward(1, Mark::Cursor(0)),
+                }),
+            },
+        );
+        keymap.bind_key(
+            Key::Delete,
+            Command {
+                number: 1,
+                action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
+                object: Some(TextObject {
+                    kind: Kind::Char,
+                    offset: Offset::Forward(1, Mark::Cursor(0)),
+                }),
+            },
+        );
+        keymap.bind_key(
+            Key::Ctrl('h'),
+            Command {
+                number: 1,
+                action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
+                object: Some(TextObject {
+                    kind: Kind::Char,
+                    offset: Offset::Backward(1, Mark::Cursor(0)),
+                }),
+            },
+        );
 
         keymap.bind_key(Key::Ctrl('d'), Command::duplicate_selection());
         keymap.bind_key(Key::Ctrl('k'), Command::delete_selection());
@@ -108,7 +153,7 @@ impl StandardMode {
             KeyMapState::Match(c) => {
                 self.match_in_progress = false;
                 BuilderEvent::Complete(c)
-            },
+            }
             KeyMapState::Continue => {
                 self.match_in_progress = true;
                 BuilderEvent::Incomplete
@@ -119,7 +164,6 @@ impl StandardMode {
             }
         }
     }
-
 }
 
 impl Mode for StandardMode {
@@ -127,7 +171,7 @@ impl Mode for StandardMode {
     /// If no match is found, treat it as an InsertChar command.
     fn handle_key_event(&mut self, key: Key) -> BuilderEvent {
         if self.match_in_progress {
-            return self.check_key(key)
+            return self.check_key(key);
         }
 
         if let Key::Char(c) = key {
@@ -135,7 +179,6 @@ impl Mode for StandardMode {
         } else {
             self.check_key(key)
         }
-
     }
 }
 

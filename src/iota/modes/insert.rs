@@ -1,9 +1,8 @@
+use command::{BuilderEvent, Command};
 use keyboard::Key;
 use keymap::{KeyMap, KeyMapState};
-use command::{BuilderEvent, Command};
 
 use super::{Mode, ModeType};
-
 
 /// `InsertMode` mimics Vi's Insert mode.
 pub struct InsertMode {
@@ -11,7 +10,6 @@ pub struct InsertMode {
 }
 
 impl InsertMode {
-
     /// Create a new instance of `InsertMode`
     pub fn new() -> InsertMode {
         InsertMode {
@@ -27,7 +25,6 @@ impl InsertMode {
 
         keymap
     }
-
 }
 
 impl Mode for InsertMode {
@@ -39,6 +36,5 @@ impl Mode for InsertMode {
         } else {
             BuilderEvent::Incomplete
         }
-    
     }
 }

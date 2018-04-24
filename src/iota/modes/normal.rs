@@ -1,9 +1,8 @@
+use command::{Builder, BuilderEvent, Command};
 use keyboard::Key;
 use keymap::{KeyMap, KeyMapState};
-use command::{Builder, BuilderEvent, Command};
 
 use super::{Mode, ModeType};
-
 
 /// `NormalMode` mimics Vi's Normal mode.
 pub struct NormalMode {
@@ -12,7 +11,6 @@ pub struct NormalMode {
 }
 
 impl NormalMode {
-
     /// Create a new instance of `NormalMode`
     pub fn new() -> NormalMode {
         NormalMode {
@@ -39,7 +37,6 @@ impl NormalMode {
             BuilderEvent::Incomplete
         }
     }
-
 }
 
 impl Mode for NormalMode {
@@ -49,7 +46,7 @@ impl Mode for NormalMode {
             BuilderEvent::Complete(cmd) => BuilderEvent::Complete(cmd),
 
             // no command from the builder, check the internal keymap
-            BuilderEvent::Incomplete => { self.check_keymap(key) }
+            BuilderEvent::Incomplete => self.check_keymap(key),
 
             // invalid result from builder, return invalid if the internal
             // keymap doesn't give a match
@@ -57,7 +54,7 @@ impl Mode for NormalMode {
                 let val = self.check_keymap(key);
 
                 if let BuilderEvent::Incomplete = val {
-                    BuilderEvent::Invalid 
+                    BuilderEvent::Invalid
                 } else {
                     val
                 }

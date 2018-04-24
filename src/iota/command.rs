@@ -1,9 +1,9 @@
-use keyboard::Key;
-use keymap::{ KeyMap, KeyMapState };
 use buffer::Mark;
-use textobject::{ TextObject, Offset, Kind, Anchor };
-use overlay::OverlayType;
+use keyboard::Key;
+use keymap::{KeyMap, KeyMapState};
 use modes::ModeType;
+use overlay::OverlayType;
+use textobject::{Anchor, Kind, Offset, TextObject};
 
 /// Instructions for the Editor.
 /// These do NOT alter the text, but may change editor/view state
@@ -28,18 +28,18 @@ pub enum Instruction {
 /// to concrete operations on absolute indexes (insert 'a' at index 158, etc.)
 #[derive(Copy, Clone, Debug)]
 pub enum Operation {
-    Insert(char), // insert text
+    Insert(char),         // insert text
     DeleteObject,         // delete some object
     DeleteFromMark(Mark), // delete from some mark to an object
-    DuplicateSelection, // duplicate the selection
-    DeleteSelection, // delete the selection
-    CutSelection, // cut the selection from the buffer to the clipboard
-    CopySelection, // copy the selection to the clipboard
-    Paste, // insert the clipboard
-    MoveSelection(bool), //Move the current selection up or down
+    DuplicateSelection,   // duplicate the selection
+    DeleteSelection,      // delete the selection
+    CutSelection,         // cut the selection from the buffer to the clipboard
+    CopySelection,        // copy the selection to the clipboard
+    Paste,                // insert the clipboard
+    MoveSelection(bool),  //Move the current selection up or down
 
-    Undo,         // rewind buffer transaction log
-    Redo,         // replay buffer transaction log
+    Undo, // rewind buffer transaction log
+    Redo, // replay buffer transaction log
 }
 
 /// Fragments that can be combined to specify a command
@@ -60,8 +60,8 @@ pub enum Action {
 /// A complete, actionable command
 #[derive(Copy, Clone, Debug)]
 pub struct Command {
-    pub number: i32,        // numeric paramter, line number, repeat count, etc.
-    pub action: Action,     // what to do
+    pub number: i32,                // numeric paramter, line number, repeat count, etc.
+    pub action: Action,             // what to do
     pub object: Option<TextObject>, // where to do it
 }
 
@@ -126,7 +126,7 @@ impl Command {
         Command {
             number: 1,
             action: Action::Operation(Operation::DeleteSelection),
-            object: None
+            object: None,
         }
     }
 
@@ -135,7 +135,7 @@ impl Command {
         Command {
             number: 1,
             action: Action::Operation(Operation::DuplicateSelection),
-            object: None
+            object: None,
         }
     }
 
@@ -144,7 +144,7 @@ impl Command {
         Command {
             number: 1,
             action: Action::Operation(Operation::CutSelection),
-            object: None
+            object: None,
         }
     }
 
@@ -153,7 +153,7 @@ impl Command {
         Command {
             number: 1,
             action: Action::Operation(Operation::Paste),
-            object: None
+            object: None,
         }
     }
 
@@ -162,7 +162,7 @@ impl Command {
         Command {
             number: 1,
             action: Action::Operation(Operation::CopySelection),
-            object: None
+            object: None,
         }
     }
 
@@ -170,7 +170,7 @@ impl Command {
         Command {
             number: 1,
             action: Action::Operation(Operation::MoveSelection(down)),
-            object: None
+            object: None,
         }
     }
 
@@ -179,7 +179,7 @@ impl Command {
         Command {
             number: 1,
             action: Action::Operation(Operation::Undo),
-            object: None
+            object: None,
         }
     }
 
@@ -188,7 +188,7 @@ impl Command {
         Command {
             number: 1,
             action: Action::Operation(Operation::Redo),
-            object: None
+            object: None,
         }
     }
 
@@ -198,8 +198,8 @@ impl Command {
             action: Action::Instruction(Instruction::SetMark(Mark::Cursor(0))),
             object: Some(TextObject {
                 kind: kind,
-                offset: offset
-            })
+                offset: offset,
+            }),
         }
     }
 
@@ -229,9 +229,9 @@ pub struct Builder {
 
 #[derive(Copy, Clone, Debug)]
 pub enum BuilderEvent {
-    Invalid,            // cannot find a valid interpretation
-    Incomplete,         // needs more information
-    Complete(Command),  // command is finished
+    Invalid,           // cannot find a valid interpretation
+    Incomplete,        // needs more information
+    Complete(Command), // command is finished
 }
 
 impl Builder {
@@ -246,7 +246,7 @@ impl Builder {
             offset: None,
             object: None,
             reading_number: false,
-            keymap: default_keymap()
+            keymap: default_keymap(),
         }
     }
 
@@ -271,22 +271,24 @@ impl Builder {
                 self.append_digit(n as i32);
                 return BuilderEvent::Incomplete;
             } else if self.reading_number {
-
                 self.reading_number = false;
             }
         }
 
         match self.keymap.check_key(key) {
             KeyMapState::Match(partial) => self.apply_partial(partial),
-            KeyMapState::None           => { self.reset(); return BuilderEvent::Invalid; }
-            _ => {},
+            KeyMapState::None => {
+                self.reset();
+                return BuilderEvent::Invalid;
+            }
+            _ => {}
         }
 
         if let Some(c) = self.complete_command() {
             self.reset();
-            return BuilderEvent::Complete(c)
+            return BuilderEvent::Complete(c);
         } else {
-            return BuilderEvent::Incomplete
+            return BuilderEvent::Incomplete;
         }
     }
 
@@ -339,7 +341,7 @@ impl Builder {
             return Some(Command {
                 number: self.repeat.unwrap_or(1) as i32,
                 action: Action::Instruction(i),
-                object: self.complete_object()
+                object: self.complete_object(),
             });
         }
 
@@ -349,14 +351,14 @@ impl Builder {
                 return Some(Command {
                     number: self.repeat.unwrap_or(1) as i32,
                     action: Action::Operation(o),
-                    object: Some(to)
+                    object: Some(to),
                 });
             } else {
                 // we have just an object, assume move cursor instruction
                 return Some(Command {
                     number: self.repeat.unwrap_or(1) as i32,
                     action: Action::Instruction(Instruction::SetMark(Mark::Cursor(0))),
-                    object: Some(to)
+                    object: Some(to),
                 });
             }
         }
@@ -365,7 +367,7 @@ impl Builder {
 
     fn append_digit(&mut self, n: i32) {
         if let Some(current) = self.number {
-            self.number = Some((current*10) + n);
+            self.number = Some((current * 10) + n);
         } else {
             self.number = Some(n);
         }
@@ -373,10 +375,10 @@ impl Builder {
 
     fn apply_partial(&mut self, partial: Partial) {
         match partial {
-            Partial::Kind(k)      => self.kind = Some(k),
-            Partial::Anchor(a)    => self.anchor = Some(a),
-            Partial::Object(o)    => self.object = Some(o),
-            Partial::Action(a)    => {
+            Partial::Kind(k) => self.kind = Some(k),
+            Partial::Anchor(a) => self.anchor = Some(a),
+            Partial::Object(o) => self.object = Some(o),
+            Partial::Action(a) => {
                 self.action = Some(a);
                 if !self.reading_number && self.number.is_some() && self.repeat.is_none() {
                     // the first number followed by an action is treated as a repetition
@@ -413,9 +415,15 @@ impl Builder {
 
         // propagate downwards from object to unset partials
         if let Some(object) = self.object {
-            if self.offset.is_none() { self.offset = Some(object.offset); }
-            if self.kind.is_none() { self.kind = Some(object.kind); }
-            if self.anchor.is_none() { self.anchor = Some(object.kind.get_anchor()); }
+            if self.offset.is_none() {
+                self.offset = Some(object.offset);
+            }
+            if self.kind.is_none() {
+                self.kind = Some(object.kind);
+            }
+            if self.anchor.is_none() {
+                self.anchor = Some(object.kind.get_anchor());
+            }
         }
 
         if self.offset.is_some() && self.kind.is_some() && self.object.is_none() {
@@ -431,65 +439,107 @@ fn default_keymap() -> KeyMap<Partial> {
     let mut keymap = KeyMap::new();
 
     // next/previous char
-    keymap.bind_key(Key::Char('l'), Partial::Object(TextObject {
-        kind: Kind::Char,
-        offset: Offset::Forward(1, Mark::Cursor(0))
-    }));
-    keymap.bind_key(Key::Char('h'), Partial::Object(TextObject {
-        kind: Kind::Char,
-        offset: Offset::Backward(1, Mark::Cursor(0))
-    }));
-    keymap.bind_key(Key::Right, Partial::Object(TextObject {
-        kind: Kind::Char,
-        offset: Offset::Forward(1, Mark::Cursor(0))
-    }));
-    keymap.bind_key(Key::Left, Partial::Object(TextObject {
-        kind: Kind::Char,
-        offset: Offset::Backward(1, Mark::Cursor(0))
-    }));
+    keymap.bind_key(
+        Key::Char('l'),
+        Partial::Object(TextObject {
+            kind: Kind::Char,
+            offset: Offset::Forward(1, Mark::Cursor(0)),
+        }),
+    );
+    keymap.bind_key(
+        Key::Char('h'),
+        Partial::Object(TextObject {
+            kind: Kind::Char,
+            offset: Offset::Backward(1, Mark::Cursor(0)),
+        }),
+    );
+    keymap.bind_key(
+        Key::Right,
+        Partial::Object(TextObject {
+            kind: Kind::Char,
+            offset: Offset::Forward(1, Mark::Cursor(0)),
+        }),
+    );
+    keymap.bind_key(
+        Key::Left,
+        Partial::Object(TextObject {
+            kind: Kind::Char,
+            offset: Offset::Backward(1, Mark::Cursor(0)),
+        }),
+    );
 
     // next/previous line
-    keymap.bind_key(Key::Char('j'), Partial::Object(TextObject {
-        kind: Kind::Line(Anchor::Same),
-        offset: Offset::Forward(1, Mark::Cursor(0))
-    }));
-    keymap.bind_key(Key::Char('k'), Partial::Object(TextObject {
-        kind: Kind::Line(Anchor::Same),
-        offset: Offset::Backward(1, Mark::Cursor(0))
-    }));
-    keymap.bind_key(Key::Down, Partial::Object(TextObject {
-        kind: Kind::Line(Anchor::Same),
-        offset: Offset::Forward(1, Mark::Cursor(0))
-    }));
-    keymap.bind_key(Key::Up, Partial::Object(TextObject {
-        kind: Kind::Line(Anchor::Same),
-        offset: Offset::Backward(1, Mark::Cursor(0))
-    }));
+    keymap.bind_key(
+        Key::Char('j'),
+        Partial::Object(TextObject {
+            kind: Kind::Line(Anchor::Same),
+            offset: Offset::Forward(1, Mark::Cursor(0)),
+        }),
+    );
+    keymap.bind_key(
+        Key::Char('k'),
+        Partial::Object(TextObject {
+            kind: Kind::Line(Anchor::Same),
+            offset: Offset::Backward(1, Mark::Cursor(0)),
+        }),
+    );
+    keymap.bind_key(
+        Key::Down,
+        Partial::Object(TextObject {
+            kind: Kind::Line(Anchor::Same),
+            offset: Offset::Forward(1, Mark::Cursor(0)),
+        }),
+    );
+    keymap.bind_key(
+        Key::Up,
+        Partial::Object(TextObject {
+            kind: Kind::Line(Anchor::Same),
+            offset: Offset::Backward(1, Mark::Cursor(0)),
+        }),
+    );
 
     // next/previous word
-    keymap.bind_key(Key::Char('w'), Partial::Object(TextObject {
-        kind: Kind::Word(Anchor::Start),
-        offset: Offset::Forward(1, Mark::Cursor(0))
-    }));
-    keymap.bind_key(Key::Char('b'), Partial::Object(TextObject {
-        kind: Kind::Word(Anchor::Start),
-        offset: Offset::Backward(1, Mark::Cursor(0))
-    }));
+    keymap.bind_key(
+        Key::Char('w'),
+        Partial::Object(TextObject {
+            kind: Kind::Word(Anchor::Start),
+            offset: Offset::Forward(1, Mark::Cursor(0)),
+        }),
+    );
+    keymap.bind_key(
+        Key::Char('b'),
+        Partial::Object(TextObject {
+            kind: Kind::Word(Anchor::Start),
+            offset: Offset::Backward(1, Mark::Cursor(0)),
+        }),
+    );
 
     // start/end line
-    keymap.bind_key(Key::Char('$'), Partial::Object(TextObject {
-        kind: Kind::Line(Anchor::End),
-        offset: Offset::Forward(0, Mark::Cursor(0)),
-    }));
-    keymap.bind_key(Key::Char('0'), Partial::Object(TextObject {
-        kind: Kind::Line(Anchor::Start),
-        offset: Offset::Backward(0, Mark::Cursor(0)),
-    }));
+    keymap.bind_key(
+        Key::Char('$'),
+        Partial::Object(TextObject {
+            kind: Kind::Line(Anchor::End),
+            offset: Offset::Forward(0, Mark::Cursor(0)),
+        }),
+    );
+    keymap.bind_key(
+        Key::Char('0'),
+        Partial::Object(TextObject {
+            kind: Kind::Line(Anchor::Start),
+            offset: Offset::Backward(0, Mark::Cursor(0)),
+        }),
+    );
 
     // kinds
     keymap.bind_keys(&[Key::Char('`'), Key::Char('c')], Partial::Kind(Kind::Char));
-    keymap.bind_keys(&[Key::Char('`'), Key::Char('w')], Partial::Kind(Kind::Word(Anchor::Start)));
-    keymap.bind_keys(&[Key::Char('`'), Key::Char('l')], Partial::Kind(Kind::Line(Anchor::Start)));
+    keymap.bind_keys(
+        &[Key::Char('`'), Key::Char('w')],
+        Partial::Kind(Kind::Word(Anchor::Start)),
+    );
+    keymap.bind_keys(
+        &[Key::Char('`'), Key::Char('l')],
+        Partial::Kind(Kind::Line(Anchor::Start)),
+    );
 
     // anchors
     keymap.bind_key(Key::Char(','), Partial::Anchor(Anchor::Start));
@@ -498,9 +548,22 @@ fn default_keymap() -> KeyMap<Partial> {
     keymap.bind_key(Key::Char('>'), Partial::Anchor(Anchor::After));
 
     // actions
-    keymap.bind_key(Key::Char('D'), Partial::Action(Action::Operation(Operation::DeleteObject)));
-    keymap.bind_key(Key::Char('d'), Partial::Action(Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0)))));
-    keymap.bind_key(Key::Char(':'), Partial::Action(Action::Instruction(Instruction::SetOverlay(OverlayType::CommandPrompt))));
+    keymap.bind_key(
+        Key::Char('D'),
+        Partial::Action(Action::Operation(Operation::DeleteObject)),
+    );
+    keymap.bind_key(
+        Key::Char('d'),
+        Partial::Action(Action::Operation(Operation::DeleteFromMark(Mark::Cursor(
+            0,
+        )))),
+    );
+    keymap.bind_key(
+        Key::Char(':'),
+        Partial::Action(Action::Instruction(Instruction::SetOverlay(
+            OverlayType::CommandPrompt,
+        ))),
+    );
 
     keymap
 }

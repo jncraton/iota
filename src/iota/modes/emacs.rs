@@ -1,11 +1,10 @@
+use buffer::Mark;
+use command::{Action, BuilderEvent, Command, Instruction, Operation};
 use keyboard::Key;
 use keymap::{KeyMap, KeyMapState};
-use buffer::Mark;
-use command::{BuilderEvent, Operation, Instruction, Command, Action};
-use textobject::{Anchor, Kind, TextObject, Offset};
+use textobject::{Anchor, Kind, Offset, TextObject};
 
 use super::Mode;
-
 
 /// Emacs mode uses Emacs-like keybindings.
 ///
@@ -15,7 +14,6 @@ pub struct EmacsMode {
 }
 
 impl EmacsMode {
-
     /// Create a new instance of EmacsMode
     pub fn new() -> EmacsMode {
         EmacsMode {
@@ -33,62 +31,122 @@ impl EmacsMode {
         keymap.bind_keys(&[Key::Ctrl('x'), Key::Ctrl('s')], Command::save_buffer());
 
         // Cursor movement
-        keymap.bind_key(Key::Up, Command::movement(Offset::Backward(1, Mark::Cursor(0)), Kind::Line(Anchor::Same)));
-        keymap.bind_key(Key::Down, Command::movement(Offset::Forward(1, Mark::Cursor(0)), Kind::Line(Anchor::Same)));
-        keymap.bind_key(Key::Left, Command::movement(Offset::Backward(1, Mark::Cursor(0)), Kind::Char));
-        keymap.bind_key(Key::Right, Command::movement(Offset::Forward(1, Mark::Cursor(0)), Kind::Char));
-        keymap.bind_key(Key::Ctrl('p'), Command::movement(Offset::Backward(1, Mark::Cursor(0)), Kind::Line(Anchor::Same)));
-        keymap.bind_key(Key::Ctrl('n'), Command::movement(Offset::Forward(1, Mark::Cursor(0)), Kind::Line(Anchor::Same)));
-        keymap.bind_key(Key::Ctrl('b'), Command::movement(Offset::Backward(1, Mark::Cursor(0)), Kind::Char));
-        keymap.bind_key(Key::Ctrl('f'), Command::movement(Offset::Forward(1, Mark::Cursor(0)), Kind::Char));
-        keymap.bind_key(Key::Ctrl('e'), Command::movement(Offset::Forward(0, Mark::Cursor(0)), Kind::Line(Anchor::End)));
-        keymap.bind_key(Key::Ctrl('a'), Command::movement(Offset::Backward(0, Mark::Cursor(0)), Kind::Line(Anchor::Start)));
+        keymap.bind_key(
+            Key::Up,
+            Command::movement(
+                Offset::Backward(1, Mark::Cursor(0)),
+                Kind::Line(Anchor::Same),
+            ),
+        );
+        keymap.bind_key(
+            Key::Down,
+            Command::movement(
+                Offset::Forward(1, Mark::Cursor(0)),
+                Kind::Line(Anchor::Same),
+            ),
+        );
+        keymap.bind_key(
+            Key::Left,
+            Command::movement(Offset::Backward(1, Mark::Cursor(0)), Kind::Char),
+        );
+        keymap.bind_key(
+            Key::Right,
+            Command::movement(Offset::Forward(1, Mark::Cursor(0)), Kind::Char),
+        );
+        keymap.bind_key(
+            Key::Ctrl('p'),
+            Command::movement(
+                Offset::Backward(1, Mark::Cursor(0)),
+                Kind::Line(Anchor::Same),
+            ),
+        );
+        keymap.bind_key(
+            Key::Ctrl('n'),
+            Command::movement(
+                Offset::Forward(1, Mark::Cursor(0)),
+                Kind::Line(Anchor::Same),
+            ),
+        );
+        keymap.bind_key(
+            Key::Ctrl('b'),
+            Command::movement(Offset::Backward(1, Mark::Cursor(0)), Kind::Char),
+        );
+        keymap.bind_key(
+            Key::Ctrl('f'),
+            Command::movement(Offset::Forward(1, Mark::Cursor(0)), Kind::Char),
+        );
+        keymap.bind_key(
+            Key::Ctrl('e'),
+            Command::movement(Offset::Forward(0, Mark::Cursor(0)), Kind::Line(Anchor::End)),
+        );
+        keymap.bind_key(
+            Key::Ctrl('a'),
+            Command::movement(
+                Offset::Backward(0, Mark::Cursor(0)),
+                Kind::Line(Anchor::Start),
+            ),
+        );
 
         // Editing
         keymap.bind_key(Key::Tab, Command::insert_tab());
         keymap.bind_key(Key::Enter, Command::insert_char('\n'));
-        keymap.bind_key(Key::Backspace, Command {
-            number: 1,
-            action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
-            object: Some(TextObject {
-                kind: Kind::Char,
-                offset: Offset::Backward(1, Mark::Cursor(0))
-            })
-        });
-        keymap.bind_key(Key::Delete, Command {
-            number: 1,
-            action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
-            object: Some(TextObject {
-                kind: Kind::Char,
-                offset: Offset::Forward(1, Mark::Cursor(0))
-            })
-        });
-        keymap.bind_key(Key::Ctrl('h'), Command {
-            number: 1,
-            action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
-            object: Some(TextObject {
-                kind: Kind::Char,
-                offset: Offset::Backward(1, Mark::Cursor(0))
-            })
-        });
-        keymap.bind_key(Key::Ctrl('d'), Command {
-            number: 1,
-            action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
-            object: Some(TextObject {
-                kind: Kind::Char,
-                offset: Offset::Forward(1, Mark::Cursor(0))
-            })
-        });
+        keymap.bind_key(
+            Key::Backspace,
+            Command {
+                number: 1,
+                action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
+                object: Some(TextObject {
+                    kind: Kind::Char,
+                    offset: Offset::Backward(1, Mark::Cursor(0)),
+                }),
+            },
+        );
+        keymap.bind_key(
+            Key::Delete,
+            Command {
+                number: 1,
+                action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
+                object: Some(TextObject {
+                    kind: Kind::Char,
+                    offset: Offset::Forward(1, Mark::Cursor(0)),
+                }),
+            },
+        );
+        keymap.bind_key(
+            Key::Ctrl('h'),
+            Command {
+                number: 1,
+                action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
+                object: Some(TextObject {
+                    kind: Kind::Char,
+                    offset: Offset::Backward(1, Mark::Cursor(0)),
+                }),
+            },
+        );
+        keymap.bind_key(
+            Key::Ctrl('d'),
+            Command {
+                number: 1,
+                action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
+                object: Some(TextObject {
+                    kind: Kind::Char,
+                    offset: Offset::Forward(1, Mark::Cursor(0)),
+                }),
+            },
+        );
         // keymap.bind_keys(&[Key::Ctrl('x'), Key::Ctrl('f')], Command {
         //     number: 1,
         //     action: Action::Instruction(Instruction::SetOverlay(OverlayType::SelectFile)),
         //     object: None
         // });
-        keymap.bind_keys(&[Key::Ctrl('x'), Key::Ctrl('b')], Command {
-            number: 1,
-            action: Action::Instruction(Instruction::SwitchToLastBuffer),
-            object: None
-        });
+        keymap.bind_keys(
+            &[Key::Ctrl('x'), Key::Ctrl('b')],
+            Command {
+                number: 1,
+                action: Action::Instruction(Instruction::SwitchToLastBuffer),
+                object: None,
+            },
+        );
 
         keymap
     }
@@ -107,7 +165,7 @@ impl EmacsMode {
             KeyMapState::Match(c) => {
                 self.match_in_progress = false;
                 BuilderEvent::Complete(c)
-            },
+            }
             KeyMapState::Continue => {
                 self.match_in_progress = true;
                 BuilderEvent::Incomplete
@@ -118,7 +176,6 @@ impl EmacsMode {
             }
         }
     }
-
 }
 
 impl Mode for EmacsMode {
@@ -126,7 +183,7 @@ impl Mode for EmacsMode {
     /// If no match is found, treat it as an InsertChar command.
     fn handle_key_event(&mut self, key: Key) -> BuilderEvent {
         if self.match_in_progress {
-            return self.check_key(key)
+            return self.check_key(key);
         }
 
         if let Key::Char(c) = key {
@@ -134,7 +191,6 @@ impl Mode for EmacsMode {
         } else {
             self.check_key(key)
         }
-
     }
 }
 
