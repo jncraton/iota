@@ -18,17 +18,15 @@ extern crate lazy_static;
 
 pub use editor::Editor;
 pub use input::Input;
-pub use modes::{EmacsMode, Mode, NormalMode, StandardMode};
 
 mod buffer;
 mod command;
 mod editor;
 mod input;
 mod iterators;
-mod keyboard;
-mod keymap;
+mod key;
+mod bindings;
 mod log;
-mod modes;
 mod overlay;
 mod textobject;
 mod utils;

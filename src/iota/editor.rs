@@ -9,9 +9,9 @@ use buffer::Buffer;
 use command::Command;
 use command::{Action, BuilderEvent, Instruction, Operation};
 use input::Input;
-use keyboard::Key;
-use modes::{InsertMode, Mode, ModeType, NormalMode};
+use key::Key;
 use view::View;
+use bindings;
 
 /// The main Editor structure
 ///
@@ -21,7 +21,6 @@ pub struct Editor<'e> {
     view: View<'e>,
     running: bool,
     rb: RustBox,
-    mode: Box<Mode + 'e>,
 
     command_queue: Receiver<Command>,
     command_sender: Sender<Command>,
@@ -29,7 +28,7 @@ pub struct Editor<'e> {
 
 impl<'e> Editor<'e> {
     /// Create a new Editor instance from the given source
-    pub fn new(source: Input, mode: Box<Mode + 'e>, rb: RustBox) -> Editor<'e> {
+    pub fn new(source: Input, rb: RustBox) -> Editor<'e> {
         let height = rb.height();
         let width = rb.width();
 
@@ -53,7 +52,6 @@ impl<'e> Editor<'e> {
             view: view,
             running: true,
             rb: rb,
-            mode: mode,
 
             command_queue: recv,
             command_sender: snd,
@@ -80,7 +78,7 @@ impl<'e> Editor<'e> {
         };
 
         let command = match self.view.overlay {
-            None => self.mode.handle_key_event(key),
+            None => bindings::handle_key_event(key),
             Some(ref mut overlay) => overlay.handle_key_event(key),
         };
 
@@ -135,10 +133,6 @@ impl<'e> Editor<'e> {
                 }
             }
             Instruction::SetOverlay(overlay_type) => self.view.set_overlay(overlay_type),
-            Instruction::SetMode(mode) => match mode {
-                ModeType::Insert => self.mode = Box::new(InsertMode::new()),
-                ModeType::Normal => self.mode = Box::new(NormalMode::new()),
-            },
             Instruction::SwitchToLastBuffer => {
                 self.view.switch_last_buffer();
                 self.view.clear(&mut self.rb);

@@ -5,7 +5,7 @@ use rustbox::{Color, RustBox, Style};
 use unicode_width::UnicodeWidthStr;
 
 use command::{BuilderEvent, Command};
-use keyboard::Key;
+use key::Key;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum OverlayType {

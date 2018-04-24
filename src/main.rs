@@ -7,7 +7,7 @@ extern crate rustbox;
 extern crate rustc_serialize;
 
 use docopt::Docopt;
-use iota::{Editor, EmacsMode, Input, Mode, NormalMode, StandardMode};
+use iota::{Editor, Input};
 use rustbox::{InitOptions, InputMode, OutputMode, RustBox};
 use std::io::stdin;
 static USAGE: &'static str = "
@@ -15,16 +15,12 @@ Usage: iota [<filename>] [options]
        iota --help
 
 Options:
-    --emacs                        Start Iota with emacs-like mode
-    --vi                           Start Iota with vi-like modes
     -h, --help                     Show this message.
 ";
 
 #[derive(RustcDecodable, Debug)]
 struct Args {
     arg_filename: Option<String>,
-    flag_emacs: bool,
-    flag_vi: bool,
     flag_help: bool,
 }
 
@@ -59,16 +55,7 @@ fn main() {
         Result::Err(e) => panic!("{}", e),
     };
 
-    // initialise the editor mode
-    let mode: Box<Mode> = if args.flag_vi {
-        Box::new(NormalMode::new())
-    } else if args.flag_emacs {
-        Box::new(EmacsMode::new())
-    } else {
-        Box::new(StandardMode::new())
-    };
-
     // start the editor
-    let mut editor = Editor::new(source, mode, rb);
+    let mut editor = Editor::new(source, rb);
     editor.start();
 }

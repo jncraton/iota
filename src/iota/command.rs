@@ -1,7 +1,5 @@
 use buffer::Mark;
-use keyboard::Key;
-use keymap::{KeyMap, KeyMapState};
-use modes::ModeType;
+use key::Key;
 use overlay::OverlayType;
 use textobject::{Anchor, Kind, Offset, TextObject};
 
@@ -15,7 +13,6 @@ pub enum Instruction {
 
     SetMark(Mark),
     SetOverlay(OverlayType),
-    SetMode(ModeType),
     ShowMessage(&'static str),
     SwitchToLastBuffer,
     None,
@@ -88,15 +85,6 @@ impl Command {
     pub fn save_buffer() -> Command {
         Command {
             action: Action::Instruction(Instruction::SaveBuffer),
-            number: 0,
-            object: None,
-        }
-    }
-
-    /// Shortcut to create SetMode command
-    pub fn set_mode(mode: ModeType) -> Command {
-        Command {
-            action: Action::Instruction(Instruction::SetMode(mode)),
             number: 0,
             object: None,
         }
@@ -224,7 +212,6 @@ pub struct Builder {
     object: Option<TextObject>,
 
     reading_number: bool,
-    keymap: KeyMap<Partial>,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -246,7 +233,6 @@ impl Builder {
             offset: None,
             object: None,
             reading_number: false,
-            keymap: default_keymap(),
         }
     }
 
@@ -260,36 +246,6 @@ impl Builder {
         self.object = None;
         self.offset = None;
         self.reading_number = false;
-    }
-
-    pub fn check_key(&mut self, key: Key) -> BuilderEvent {
-        if let Key::Char(c) = key {
-            // '0' might be bound (start of line), and cannot be the start of a number sequence
-            if c.is_digit(10) && (self.reading_number || c != '0') {
-                let n = c.to_digit(10).unwrap();
-                self.reading_number = true;
-                self.append_digit(n as i32);
-                return BuilderEvent::Incomplete;
-            } else if self.reading_number {
-                self.reading_number = false;
-            }
-        }
-
-        match self.keymap.check_key(key) {
-            KeyMapState::Match(partial) => self.apply_partial(partial),
-            KeyMapState::None => {
-                self.reset();
-                return BuilderEvent::Invalid;
-            }
-            _ => {}
-        }
-
-        if let Some(c) = self.complete_command() {
-            self.reset();
-            return BuilderEvent::Complete(c);
-        } else {
-            return BuilderEvent::Incomplete;
-        }
     }
 
     fn complete_object(&mut self) -> Option<TextObject> {
@@ -433,137 +389,4 @@ impl Builder {
             });
         }
     }
-}
-
-fn default_keymap() -> KeyMap<Partial> {
-    let mut keymap = KeyMap::new();
-
-    // next/previous char
-    keymap.bind_key(
-        Key::Char('l'),
-        Partial::Object(TextObject {
-            kind: Kind::Char,
-            offset: Offset::Forward(1, Mark::Cursor(0)),
-        }),
-    );
-    keymap.bind_key(
-        Key::Char('h'),
-        Partial::Object(TextObject {
-            kind: Kind::Char,
-            offset: Offset::Backward(1, Mark::Cursor(0)),
-        }),
-    );
-    keymap.bind_key(
-        Key::Right,
-        Partial::Object(TextObject {
-            kind: Kind::Char,
-            offset: Offset::Forward(1, Mark::Cursor(0)),
-        }),
-    );
-    keymap.bind_key(
-        Key::Left,
-        Partial::Object(TextObject {
-            kind: Kind::Char,
-            offset: Offset::Backward(1, Mark::Cursor(0)),
-        }),
-    );
-
-    // next/previous line
-    keymap.bind_key(
-        Key::Char('j'),
-        Partial::Object(TextObject {
-            kind: Kind::Line(Anchor::Same),
-            offset: Offset::Forward(1, Mark::Cursor(0)),
-        }),
-    );
-    keymap.bind_key(
-        Key::Char('k'),
-        Partial::Object(TextObject {
-            kind: Kind::Line(Anchor::Same),
-            offset: Offset::Backward(1, Mark::Cursor(0)),
-        }),
-    );
-    keymap.bind_key(
-        Key::Down,
-        Partial::Object(TextObject {
-            kind: Kind::Line(Anchor::Same),
-            offset: Offset::Forward(1, Mark::Cursor(0)),
-        }),
-    );
-    keymap.bind_key(
-        Key::Up,
-        Partial::Object(TextObject {
-            kind: Kind::Line(Anchor::Same),
-            offset: Offset::Backward(1, Mark::Cursor(0)),
-        }),
-    );
-
-    // next/previous word
-    keymap.bind_key(
-        Key::Char('w'),
-        Partial::Object(TextObject {
-            kind: Kind::Word(Anchor::Start),
-            offset: Offset::Forward(1, Mark::Cursor(0)),
-        }),
-    );
-    keymap.bind_key(
-        Key::Char('b'),
-        Partial::Object(TextObject {
-            kind: Kind::Word(Anchor::Start),
-            offset: Offset::Backward(1, Mark::Cursor(0)),
-        }),
-    );
-
-    // start/end line
-    keymap.bind_key(
-        Key::Char('$'),
-        Partial::Object(TextObject {
-            kind: Kind::Line(Anchor::End),
-            offset: Offset::Forward(0, Mark::Cursor(0)),
-        }),
-    );
-    keymap.bind_key(
-        Key::Char('0'),
-        Partial::Object(TextObject {
-            kind: Kind::Line(Anchor::Start),
-            offset: Offset::Backward(0, Mark::Cursor(0)),
-        }),
-    );
-
-    // kinds
-    keymap.bind_keys(&[Key::Char('`'), Key::Char('c')], Partial::Kind(Kind::Char));
-    keymap.bind_keys(
-        &[Key::Char('`'), Key::Char('w')],
-        Partial::Kind(Kind::Word(Anchor::Start)),
-    );
-    keymap.bind_keys(
-        &[Key::Char('`'), Key::Char('l')],
-        Partial::Kind(Kind::Line(Anchor::Start)),
-    );
-
-    // anchors
-    keymap.bind_key(Key::Char(','), Partial::Anchor(Anchor::Start));
-    keymap.bind_key(Key::Char('.'), Partial::Anchor(Anchor::End));
-    keymap.bind_key(Key::Char('<'), Partial::Anchor(Anchor::Before));
-    keymap.bind_key(Key::Char('>'), Partial::Anchor(Anchor::After));
-
-    // actions
-    keymap.bind_key(
-        Key::Char('D'),
-        Partial::Action(Action::Operation(Operation::DeleteObject)),
-    );
-    keymap.bind_key(
-        Key::Char('d'),
-        Partial::Action(Action::Operation(Operation::DeleteFromMark(Mark::Cursor(
-            0,
-        )))),
-    );
-    keymap.bind_key(
-        Key::Char(':'),
-        Partial::Action(Action::Instruction(Instruction::SetOverlay(
-            OverlayType::CommandPrompt,
-        ))),
-    );
-
-    keymap
 }
