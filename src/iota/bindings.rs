@@ -58,14 +58,6 @@ pub fn handle_key_event(key: Key) -> BuilderEvent {
                 offset: Offset::Forward(1, Mark::Cursor(0)),
             }),
         },
-        Key::Ctrl('h') => Command {
-            number: 1,
-            action: Action::Operation(Operation::DeleteFromMark(Mark::Cursor(0))),
-            object: Some(TextObject {
-                kind: Kind::Char,
-                offset: Offset::Backward(1, Mark::Cursor(0)),
-            }),
-        },
 
         Key::Ctrl('d') => Command::duplicate_selection(),
         Key::Ctrl('k') => Command::delete_selection(),

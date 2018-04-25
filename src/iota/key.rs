@@ -35,7 +35,7 @@ impl Key {
             5 => Some(Key::Ctrl('e')),
             6 => Some(Key::Ctrl('f')),
             7 => Some(Key::Ctrl('g')),
-            8 => Some(Key::Ctrl('h')),
+            8 => Some(Key::Backspace),
             9 => Some(Key::Tab),
             10 => Some(Key::Ctrl('j')),
             11 => Some(Key::Ctrl('k')),
