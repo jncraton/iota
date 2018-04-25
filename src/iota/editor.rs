@@ -133,10 +133,6 @@ impl<'e> Editor<'e> {
                 }
             }
             Instruction::SetOverlay(overlay_type) => self.view.set_overlay(overlay_type),
-            Instruction::SwitchToLastBuffer => {
-                self.view.switch_last_buffer();
-                self.view.clear(&mut self.rb);
-            }
             Instruction::ShowMessage(msg) => self.view.show_message(msg),
 
             _ => {}

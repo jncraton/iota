@@ -26,7 +26,6 @@ use textobject::{Anchor, Kind, Offset, TextObject};
 /// pieces of information.
 pub struct View<'v> {
     pub buffer: Arc<Mutex<Buffer>>,
-    pub last_buffer: Option<Arc<Mutex<Buffer>>>,
     pub overlay: Option<Box<Overlay + 'v>>,
 
     /// Used to store clipboard if system clipboard is not available
@@ -67,7 +66,6 @@ impl<'v> View<'v> {
 
         View {
             buffer: buffer,
-            last_buffer: None,
             top_line: top_line,
             left_col: 0,
             cursor: cursor,
@@ -91,30 +89,6 @@ impl<'v> View<'v> {
             kind: Kind::Line(Anchor::Same), //Anchor::Start makes more sense, but isn't implemented
             offset: Offset::Forward(1, Mark::Cursor(0)),
         }
-    }
-
-    pub fn set_buffer(&mut self, buffer: Arc<Mutex<Buffer>>) {
-        self.last_buffer = Some(self.buffer.clone());
-
-        {
-            let mut b = buffer.lock().unwrap();
-
-            b.set_mark(self.cursor, 0);
-            b.set_mark(self.top_line, 0);
-        }
-
-        self.buffer = buffer;
-    }
-
-    pub fn switch_last_buffer(&mut self) {
-        let buffer = self.buffer.clone();
-        let last_buffer = match self.last_buffer.clone() {
-            Some(buf) => buf,
-            None => return,
-        };
-
-        self.buffer = last_buffer;
-        self.last_buffer = Some(buffer);
     }
 
     /// Get the height of the View.
