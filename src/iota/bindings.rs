@@ -21,17 +21,17 @@ pub fn handle_key_event(key: Key) -> BuilderEvent {
             Offset::Forward(1, Mark::Cursor(0)),
             Kind::Line(Anchor::Same),
         ),
-        
+
         Key::PgUp => Command::movement(
             Offset::Backward(10, Mark::Cursor(0)),
             Kind::Line(Anchor::Same),
         ),
-        
+
         Key::PgDown => Command::movement(
             Offset::Forward(10, Mark::Cursor(0)),
             Kind::Line(Anchor::Same),
         ),
-        
+
         Key::Left => Command::movement(Offset::Backward(1, Mark::Cursor(0)), Kind::Char),
         Key::Right => Command::movement(Offset::Forward(1, Mark::Cursor(0)), Kind::Char),
 
