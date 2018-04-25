@@ -17,7 +17,6 @@ use view::View;
 ///
 /// This is the top-most structure in Iota.
 pub struct Editor<'e> {
-    buffers: Vec<Arc<Mutex<Buffer>>>,
     view: View<'e>,
     running: bool,
     rb: RustBox,
@@ -34,8 +33,6 @@ impl<'e> Editor<'e> {
 
         let (snd, recv) = channel();
 
-        let mut buffers = Vec::new();
-
         let buffer = match source {
             Input::Filename(path) => match path {
                 Some(path) => Buffer::from(PathBuf::from(path)),
@@ -43,12 +40,10 @@ impl<'e> Editor<'e> {
             },
             Input::Stdin(reader) => Buffer::from(reader),
         };
-        buffers.push(Arc::new(Mutex::new(buffer)));
 
-        let view = View::new(buffers[0].clone(), width, height);
+        let view = View::new(Arc::new(Mutex::new(buffer)), width, height);
 
         Editor {
-            buffers: buffers,
             view: view,
             running: true,
             rb: rb,
