@@ -6,8 +6,8 @@ extern crate rustbox;
 
 use iota::{Editor, Input};
 use rustbox::{InitOptions, InputMode, OutputMode, RustBox};
-use std::io::stdin;
 use std::env;
+use std::io::stdin;
 
 fn is_atty(fileno: libc::c_int) -> bool {
     // FIXME: find a way to do this without unsafe
