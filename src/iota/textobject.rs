@@ -18,11 +18,9 @@ impl Default for Kind {
 
 #[derive(Copy, Clone, Debug)]
 pub enum Anchor {
-    Before, // Index just prior to TextObject
-    Start,  // First index within TextObject
-    End,    // Last index within TextObject
-    After,  // First index after TextObject
-    Same,   // Same as index within current TextObject of the same Kind
+    Start, // First index within TextObject
+    End,   // Last index within TextObject
+    Same,  // Same as index within current TextObject of the same Kind
 }
 
 impl Default for Anchor {
