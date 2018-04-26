@@ -3,7 +3,6 @@ use std::borrow::Cow;
 use std::cmp;
 use std::fs::{rename, File};
 use std::io::Write;
-use std::path::Path;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::SystemTime;
@@ -11,7 +10,6 @@ use std::time::SystemTime;
 extern crate clipboard;
 use self::clipboard::{ClipboardContext, ClipboardProvider};
 
-use tempdir::TempDir;
 use unicode_width::UnicodeWidthChar;
 
 use buffer::{Buffer, Mark};
@@ -472,13 +470,7 @@ impl View {
                 Cow::Owned(PathBuf::from("untitled"))
             }
         };
-        let tmpdir = match TempDir::new_in(&Path::new("."), "iota") {
-            Ok(d) => d,
-            Err(e) => panic!("file error: {}", e),
-        };
-
-        let tmppath = tmpdir.path().join(Path::new("tmpfile"));
-        let mut file = match File::create(&tmppath) {
+        let mut file = match File::create("/tmp/iotatmp") {
             Ok(f) => f,
             Err(e) => panic!("file error: {}", e),
         };
@@ -493,7 +485,7 @@ impl View {
             }
         }
 
-        if let Err(e) = rename(&tmppath, &*path) {
+        if let Err(e) = rename("/tmp/iotatmp", &*path) {
             panic!("file error: {}", e);
         }
     }

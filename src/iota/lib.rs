@@ -11,7 +11,6 @@
 extern crate gapbuffer;
 extern crate regex;
 extern crate rustbox;
-extern crate tempdir;
 extern crate unicode_width;
 #[macro_use]
 extern crate lazy_static;

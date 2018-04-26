@@ -11,9 +11,7 @@ authors = ["Greg Chapple <gregchapple1@gmail.com>"]
 
 [dependencies]
 gapbuffer = "0.1.1"
-tempdir = "0.3.0"
 unicode-width = "0.1.1"
-libc = "0.1"
 clippy = {version = "*", optional = true}
 regex = "0.1"
 lazy_static = "0.2"
