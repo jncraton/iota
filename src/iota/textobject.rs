@@ -10,23 +10,6 @@ pub enum Kind {
     Selection(Anchor),
 }
 
-impl Kind {
-    pub fn with_anchor(&self, anchor: Anchor) -> Kind {
-        match *self {
-            Kind::Char => Kind::Char,
-            Kind::Line(_) => Kind::Line(anchor),
-            Kind::Word(_) => Kind::Word(anchor),
-            Kind::Selection(_) => Kind::Line(anchor),
-        }
-    }
-    pub fn get_anchor(&self) -> Anchor {
-        match *self {
-            Kind::Char => Default::default(),
-            Kind::Line(a) | Kind::Word(a) | Kind::Selection(a) => a,
-        }
-    }
-}
-
 impl Default for Kind {
     fn default() -> Kind {
         Kind::Char

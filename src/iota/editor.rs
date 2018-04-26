@@ -134,11 +134,6 @@ impl Editor {
                     self.view.insert_char(c)
                 }
             }
-            Operation::DeleteObject => {
-                if let Some(obj) = command.object {
-                    self.view.delete_object(obj);
-                }
-            }
             Operation::Paste => {
                 self.view.paste();
             }

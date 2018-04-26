@@ -22,7 +22,6 @@ pub enum Instruction {
 #[derive(Copy, Clone, Debug)]
 pub enum Operation {
     Insert(char),         // insert text
-    DeleteObject,         // delete some object
     DeleteFromMark(Mark), // delete from some mark to an object
     DuplicateSelection,   // duplicate the selection
     DeleteSelection,      // delete the selection

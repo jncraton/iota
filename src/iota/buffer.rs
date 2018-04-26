@@ -627,25 +627,6 @@ impl Buffer {
         Some(vec)
     }
 
-    pub fn remove_object(&mut self, object: TextObject) -> Option<Vec<char>> {
-        let object_start = TextObject {
-            kind: object.kind.with_anchor(Anchor::Start),
-            offset: object.offset,
-        };
-        let object_end = TextObject {
-            kind: object.kind.with_anchor(Anchor::End),
-            offset: object.offset,
-        };
-
-        let start = self.get_object_index(object_start);
-        let end = self.get_object_index(object_end);
-
-        if let (Some(start_pos), Some(end_pos)) = (start, end) {
-            return self.remove_range(start_pos.absolute, end_pos.absolute);
-        }
-        None
-    }
-
     /// Insert a string at the mark.
     pub fn insert_string(&mut self, mark: Mark, s: String) -> Option<usize> {
         let mut len = 0;
