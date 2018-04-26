@@ -15,7 +15,6 @@ use tempdir::TempDir;
 use unicode_width::UnicodeWidthChar;
 
 use buffer::{Buffer, Mark};
-use overlay::{CommandPrompt, Overlay, OverlayType};
 use textobject::{Anchor, Kind, Offset, TextObject};
 
 /// A View is an abstract Window (into a Buffer).
@@ -24,9 +23,8 @@ use textobject::{Anchor, Kind, Offset, TextObject};
 /// screen. It maintains the status bar for the current view, the "dirty status"
 /// which is whether the buffer has been modified or not and a number of other
 /// pieces of information.
-pub struct View<'v> {
+pub struct View {
     pub buffer: Arc<Mutex<Buffer>>,
-    pub overlay: Option<Box<Overlay + 'v>>,
 
     /// Used to store clipboard if system clipboard is not available
     clipboard: String,
@@ -52,8 +50,8 @@ pub struct View<'v> {
     message: Option<(&'static str, SystemTime)>,
 }
 
-impl<'v> View<'v> {
-    pub fn new(buffer: Arc<Mutex<Buffer>>, width: usize, height: usize) -> View<'v> {
+impl View {
+    pub fn new(buffer: Arc<Mutex<Buffer>>, width: usize, height: usize) -> View {
         let cursor = Mark::Cursor(0);
         let top_line = Mark::DisplayMark(0);
 
@@ -69,7 +67,6 @@ impl<'v> View<'v> {
             top_line: top_line,
             left_col: 0,
             cursor: cursor,
-            overlay: None,
             threshold: 5,
             message: None,
             height: height,
@@ -151,14 +148,7 @@ impl<'v> View<'v> {
         }
 
         self.draw_status(rb);
-
-        match self.overlay {
-            None => self.draw_cursor(rb),
-            Some(ref mut overlay) => {
-                overlay.draw(rb);
-                overlay.draw_cursor(rb);
-            }
-        }
+        self.draw_cursor(rb);
     }
 
     #[cfg_attr(feature = "clippy", allow(needless_range_loop))]
@@ -228,14 +218,6 @@ impl<'v> View<'v> {
                     (x - self.left_col) as isize,
                     y as isize - top_line.1 as isize,
                 );
-            }
-        }
-    }
-
-    pub fn set_overlay(&mut self, overlay_type: OverlayType) {
-        match overlay_type {
-            OverlayType::CommandPrompt => {
-                self.overlay = Some(Box::new(CommandPrompt::new()));
             }
         }
     }

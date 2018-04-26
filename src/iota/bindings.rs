@@ -1,10 +1,10 @@
 use buffer::Mark;
-use command::{Action, BuilderEvent, Command, Operation};
+use command::{Action, Command, Operation};
 use key::Key;
 use textobject::{Anchor, Kind, Offset, TextObject};
 
-pub fn handle_key_event(key: Key) -> BuilderEvent {
-    BuilderEvent::Complete(match key {
+pub fn handle_key_event(key: Key) -> Command {
+    match key {
         // Editor Commands
         Key::Ctrl('q') => Command::exit_editor(),
         Key::Ctrl('s') => Command::save_buffer(),
@@ -83,5 +83,5 @@ pub fn handle_key_event(key: Key) -> BuilderEvent {
         Key::Ctrl('y') => Command::redo(),
 
         _ => Command::noop(),
-    })
+    }
 }

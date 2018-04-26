@@ -8,7 +8,7 @@ use rustbox::{Event, RustBox};
 use bindings;
 use buffer::Buffer;
 use command::Command;
-use command::{Action, BuilderEvent, Instruction, Operation};
+use command::{Action, Instruction, Operation};
 use input::Input;
 use key::Key;
 use view::View;
@@ -16,8 +16,8 @@ use view::View;
 /// The main Editor structure
 ///
 /// This is the top-most structure in Iota.
-pub struct Editor<'e> {
-    view: View<'e>,
+pub struct Editor {
+    view: View,
     running: bool,
     rb: RustBox,
 
@@ -25,9 +25,9 @@ pub struct Editor<'e> {
     command_sender: Sender<Command>,
 }
 
-impl<'e> Editor<'e> {
+impl Editor {
     /// Create a new Editor instance from the given source
-    pub fn new(source: Input, rb: RustBox) -> Editor<'e> {
+    pub fn new(source: Input, rb: RustBox) -> Editor {
         let height = rb.height();
         let width = rb.width();
 
@@ -72,16 +72,10 @@ impl<'e> Editor<'e> {
             None => return,
         };
 
-        let command = match self.view.overlay {
-            None => bindings::handle_key_event(key),
-            Some(ref mut overlay) => overlay.handle_key_event(key),
-        };
+        let command = bindings::handle_key_event(key);
 
-        if let BuilderEvent::Complete(c) = command {
-            self.view.overlay = None;
-            self.view.clear(&mut self.rb);
-            let _ = self.command_sender.send(c);
-        }
+        self.view.clear(&mut self.rb);
+        let _ = self.command_sender.send(command);
     }
 
     /// Handle resize events
@@ -127,7 +121,6 @@ impl<'e> Editor<'e> {
                     self.view.move_mark(mark, object)
                 }
             }
-            Instruction::SetOverlay(overlay_type) => self.view.set_overlay(overlay_type),
             Instruction::ShowMessage(msg) => self.view.show_message(msg),
 
             _ => {}

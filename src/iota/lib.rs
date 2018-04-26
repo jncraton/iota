@@ -27,7 +27,6 @@ mod input;
 mod iterators;
 mod key;
 mod log;
-mod overlay;
 mod textobject;
 mod utils;
 mod view;
