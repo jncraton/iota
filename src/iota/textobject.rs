@@ -6,15 +6,8 @@ use buffer::Mark;
 pub enum Kind {
     Char,
     Line(Anchor),
-
     Word(Anchor),
     Selection(Anchor),
-    // Sentence(Anchor),
-    // Paragraph(Anchor),
-
-    // Expression(Anchor),
-    // Statement(Anchor),
-    // Block(Anchor),
 }
 
 impl Kind {
@@ -44,7 +37,6 @@ impl Default for Kind {
 pub enum Anchor {
     Before, // Index just prior to TextObject
     Start,  // First index within TextObject
-    // Middle,  // Middle index of TextObject
     End,   // Last index within TextObject
     After, // First index after TextObject
     Same,  // Same as index within current TextObject of the same Kind
@@ -61,16 +53,6 @@ pub enum Offset {
     Absolute(usize),
     Backward(usize, Mark),
     Forward(usize, Mark),
-}
-
-impl Offset {
-    pub fn with_num(&self, n: usize) -> Offset {
-        match *self {
-            Offset::Absolute(_) => Offset::Absolute(n),
-            Offset::Backward(_, m) => Offset::Backward(n, m),
-            Offset::Forward(_, m) => Offset::Forward(n, m),
-        }
-    }
 }
 
 impl Default for Offset {
